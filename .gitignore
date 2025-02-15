@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+*.env
+*.venv
+
+# Django-related files
+db.sqlite3
+*.log
+media/
+staticfiles/
+
+# Ignore secret keys & environment variables
+.env
+*.env.local
+*.env.development
+*.env.production
+config/settings_local.py  # If you have a settings override
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# Ignore node_modules (if using frontend)
+node_modules/
+package-lock.json
+yarn.lock
+next-env.d.ts
+
+# Ignore compiled files
+*.pyc
+*.pyo
+
+# Ignore deployment files
+.DS_Store
