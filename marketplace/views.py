@@ -112,9 +112,7 @@ class ProductDetailAPIView(views.APIView):
 
 class CartAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
-    """
-    API endpoint for retrieving and managing the user's cart.
-    """
+
     @swagger_auto_schema(responses={200: CartSerializer})
     def get(self, request):
         """Retrieve the current user's cart."""
@@ -127,9 +125,33 @@ class CartAPIView(views.APIView):
         """Add an item to the cart."""
         serializer = CartSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(request_body=CartSerializer, responses={200: CartSerializer})
+    def put(self, request):
+        """Update the quantity of a cart item."""
+        cart = get_object_or_404(Cart, user=request.user)
+        serializer = CartSerializer(cart, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('product_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description="ID of the product to remove")
+        ],
+        responses={204: "Item removed", 400: "Bad request"}
+    )
+    def delete(self, request):
+        """Remove an item from the cart."""
+        product_id = request.GET.get("product_id")
+        cart = get_object_or_404(Cart, user=request.user)
+        cart.products.remove(product_id)
+        cart.save()
+        return Response({"detail": "Item removed"}, status=status.HTTP_204_NO_CONTENT)
     
 class OrderAPIView(views.APIView):
     permission_classes = [IsAuthenticated]

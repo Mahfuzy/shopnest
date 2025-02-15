@@ -118,13 +118,16 @@ class ChangePasswordSerializer(serializers.Serializer):
 class UserLoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
     password = serializers.CharField(write_only=True)
-
     def validate(self, data):
-        """Authenticates user before login."""
-        user = authenticate(username=data["phone_number"], password=data["password"])
+        phone_number = data.get('phone_number')
+        password = data.get('password')
+        
+        # Adjust this line according to how authentication is implemented
+        user = authenticate(phone_number=phone_number, password=password)
+        
         if not user:
             raise serializers.ValidationError("Invalid phone number or password.")
-        if not user.is_verified:
-            raise serializers.ValidationError("Account not verified. Please verify your OTP.")
-        data["user"] = user
+        
+        data['user'] = user
         return data
+ 
