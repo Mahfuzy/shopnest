@@ -142,7 +142,10 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'accounts.User'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    'localhost',
+    'https://shopnest-oqic.onrender.com'
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
