@@ -118,16 +118,25 @@ class ChangePasswordSerializer(serializers.Serializer):
 class UserLoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
     password = serializers.CharField(write_only=True)
+
     def validate(self, data):
         phone_number = data.get('phone_number')
         password = data.get('password')
         
-        # Adjust this line according to how authentication is implemented
-        user = authenticate(phone_number=phone_number, password=password)
-        
-        if not user:
+        try:
+            user = User.objects.get(phone_number=phone_number)
+            if not user.check_password(password):
+                raise serializers.ValidationError("Invalid phone number or password.")
+            
+            if not user.is_verified:
+                raise serializers.ValidationError("Please verify your phone number first.")
+            
+            if not user.is_active:
+                raise serializers.ValidationError("Your account has been deactivated.")
+            
+            data['user'] = user
+            return data
+            
+        except User.DoesNotExist:
             raise serializers.ValidationError("Invalid phone number or password.")
-        
-        data['user'] = user
-        return data
  
